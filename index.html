@@ -99,20 +99,9 @@ button{font:inherit}
 <div id="view"></div>
 
 <script>
-const KEY='prestige_darts_clean_start_v4';
+const KEY='prestige_darts_clean_start_v5';
 const PLAYERS=['Ross','Dan','Josh','Asif','Paul'];
 let state=load();
-function migrateLegacy(){{
-  try{{
-    const old=JSON.parse(localStorage.getItem('prestige_darts_final_v1'));
-    if(old && old.results && !state.results.length){{
-      state.results=old.results.map(r=>({{id:r.id,a:r.a,b:r.b,winner:r.winner}}));
-      save();
-    }}
-  }}catch(e){{}}
-}}
-migrateLegacy();
-
 function pairId(a,b){return [a,b].sort().join('::')}
 function fixtures(){let f=[];for(let i=0;i<PLAYERS.length;i++)for(let j=i+1;j<PLAYERS.length;j++)f.push({id:pairId(PLAYERS[i],PLAYERS[j]),a:PLAYERS[i],b:PLAYERS[j]});return f}
 function load(){
