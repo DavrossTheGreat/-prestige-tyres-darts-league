@@ -29,13 +29,13 @@ button{font:inherit}
 #navRules{left:80%;bottom:0;width:20%;height:7.3%}
 #scoreOverlay{position:absolute;left:7%;top:30.8%;width:86%;height:9%;z-index:15;display:none;align-items:center;justify-content:center}
 .playerName{position:absolute;top:8%;width:24%;text-align:center;font-size:clamp(17px,4vw,34px);font-weight:900;text-shadow:0 2px 3px #000}
-.playerName.left{left:3%}
-.playerName.right{right:3%}
-.score{font-size:clamp(30px,7vw,58px);font-weight:900;line-height:1}
+.playerName.left{left:12%;width:18%}
+.playerName.right{right:12%;width:18%}
+.score{font-size:clamp(30px,7vw,58px);font-weight:900;line-height:1;cursor:pointer;pointer-events:auto}.score.liveTap{border:2px solid #ef2932;border-radius:9px;padding:5px 8px;background:#15171b}
 .score.left{position:absolute;left:32.5%;top:4%;width:12%;text-align:center}
 .score.right{position:absolute;right:32.5%;top:4%;width:12%;text-align:center}
 #liveMeta{position:absolute;left:5%;top:27.1%;width:90%;height:4%;z-index:16;display:none;text-align:right;padding-right:3%;font-size:clamp(10px,2.5vw,18px);font-weight:800;color:#bbb}
-#winLeft,#winRight{position:absolute;top:31.0%;width:11%;height:7%;z-index:25;border:2px solid #ff2732;border-radius:50%;background:#090a0d;color:#fff;font-size:clamp(14px,3.5vw,25px);font-weight:900;display:none}
+#winLeft,#winRight{position:absolute;top:31.0%;width:11%;height:7%;z-index:25;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;display:none;opacity:0}
 #winLeft{left:7%} #winRight{right:7%}
 #view{display:none;position:fixed;inset:0;background:#08090c;color:#fff;z-index:100;overflow:auto;padding:18px 14px 50px}
 #view.show{display:block}
@@ -46,15 +46,39 @@ button{font:inherit}
 .game{padding:13px 0;border-bottom:1px solid #33373d;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .small{color:#aaa;font-size:13px;line-height:1.45}
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+#tableOverlay{position:absolute;left:2%;top:62.05%;width:96%;height:18.55%;z-index:17;background:#0b0d11;border:2px solid #30343a;border-radius:13px;overflow:hidden}
+.thead{height:19%;display:flex;align-items:center;justify-content:space-between;padding:0 2.5%;border-bottom:1px solid #3a3d43}
+.thead .title{font-size:clamp(14px,3.8vw,27px);font-weight:900}
+.thead .green{color:#18d66a}
+.thead .time{font-size:clamp(8px,2.1vw,14px);color:#aeb1b7;font-weight:800}
+.liveTable{width:100%;height:81%;border-collapse:collapse;table-layout:fixed;font-size:clamp(8px,2.25vw,15px)}
+.liveTable th{height:20%;color:#aeb1b7;font-size:.84em;font-weight:800}
+.liveTable td{height:16%;text-align:center;border-top:1px solid #20242a;font-weight:700;padding:1px}
+.liveTable th:nth-child(2),.liveTable td:nth-child(2){text-align:left}
+.liveTable .rank{display:inline-flex;width:clamp(24px,6vw,40px);height:clamp(24px,6vw,40px);align-items:center;justify-content:center;border-radius:7px;background:#ef2932;color:#fff;font-weight:900}
+.liveTable .pts{color:#ff3038;font-weight:900}
+
 </style>
 </head>
 <body>
 <div id="app">
 <div class="phone" id="homeScreen">
+  <div id="tableOverlay">
+  <div class="thead"><span class="title">LEAGUE TABLE (LIVE) <span class="green">●</span></span><span class="time">UPDATED —</span></div>
+  <table class="liveTable"><thead><tr><th>#</th><th>PLAYER</th><th>P</th><th>W</th><th>D</th><th>L</th><th>PTS</th></tr></thead>
+  <tbody>
+    <tr><td><span class="rank">1</span></td><td><b>Ross</b></td><td>0</td><td>0</td><td>0</td><td>0</td><td class="pts">0</td></tr>
+    <tr><td><span class="rank">2</span></td><td><b>Dan</b></td><td>0</td><td>0</td><td>0</td><td>0</td><td class="pts">0</td></tr>
+    <tr><td><span class="rank">3</span></td><td><b>Josh</b></td><td>0</td><td>0</td><td>0</td><td>0</td><td class="pts">0</td></tr>
+    <tr><td><span class="rank">4</span></td><td><b>Asif</b></td><td>0</td><td>0</td><td>0</td><td>0</td><td class="pts">0</td></tr>
+    <tr><td><span class="rank">5</span></td><td><b>Paul</b></td><td>0</td><td>0</td><td>0</td><td>0</td><td class="pts">0</td></tr>
+  </tbody></table>
+</div>
   <div id="scoreOverlay">
     <div class="playerName left" id="p1">—</div>
-    <div class="score left" id="s1">0</div>
-    <div class="score right" id="s2">0</div>
+    <div class="score left" id="s1" onclick="addScore(0)">0</div>
+    <div class="score right" id="s2" onclick="addScore(1)">0</div>
     <div class="playerName right" id="p2">—</div>
   </div>
   <div id="liveMeta">NO MATCH STARTED</div>
@@ -75,9 +99,19 @@ button{font:inherit}
 <div id="view"></div>
 
 <script>
-const KEY='prestige_darts_final_v1';
+const KEY='prestige_darts_clean_start_v4';
 const PLAYERS=['Ross','Dan','Josh','Asif','Paul'];
 let state=load();
+function migrateLegacy(){{
+  try{{
+    const old=JSON.parse(localStorage.getItem('prestige_darts_final_v1'));
+    if(old && old.results && !state.results.length){{
+      state.results=old.results.map(r=>({{id:r.id,a:r.a,b:r.b,winner:r.winner}}));
+      save();
+    }}
+  }}catch(e){{}}
+}}
+migrateLegacy();
 
 function pairId(a,b){return [a,b].sort().join('::')}
 function fixtures(){let f=[];for(let i=0;i<PLAYERS.length;i++)for(let j=i+1;j<PLAYERS.length;j++)f.push({id:pairId(PLAYERS[i],PLAYERS[j]),a:PLAYERS[i],b:PLAYERS[j]});return f}
@@ -92,13 +126,20 @@ function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function remaining(){const done=new Set(state.results.map(r=>r.id));return state.fixtures.filter(f=>!done.has(f.id))}
 function current(){return state.live?state.fixtures.find(f=>f.id===state.live.id):null}
 function startGame(id){
-  state.live={id};
+  state.live={id,s1:0,s2:0};
+  save();
+  renderHome();
+}
+function addScore(side){
+  if(!state.live)return;
+  if(side===0)state.live.s1=(state.live.s1||0)+1;
+  else state.live.s2=(state.live.s2||0)+1;
   save();
   renderHome();
 }
 function finishCurrent(side){
   const f=current(); if(!f)return;
-  state.results.push({id:f.id,a:f.a,b:f.b,winner:side===0?f.a:f.b});
+  state.results.push({id:f.id,a:f.a,b:f.b,winner:side===0?f.a:f.b,s1:state.live.s1||0,s2:state.live.s2||0});
   state.live=null;
   save();
   renderHome();
@@ -116,17 +157,47 @@ function stats(){
 function renderHome(){
   const f=current(), ov=document.getElementById('scoreOverlay'), meta=document.getElementById('liveMeta');
   const wl=document.getElementById('winLeft'), wr=document.getElementById('winRight');
+
   if(f){
-    ov.style.display='flex'; meta.style.display='block'; meta.textContent='MATCH IN PROGRESS';
+    ov.style.display='flex';
+    meta.style.display='block';
+    meta.textContent='MATCH IN PROGRESS';
     document.getElementById('p1').textContent=f.a;
     document.getElementById('p2').textContent=f.b;
-    document.getElementById('s1').textContent='0';
-    document.getElementById('s2').textContent='0';
-    wl.style.display='block';wr.style.display='block';
+    document.getElementById('s1').textContent=state.live.s1||0;
+    document.getElementById('s2').textContent=state.live.s2||0;
+    document.getElementById('s1').classList.add('liveTap');
+    document.getElementById('s2').classList.add('liveTap');
+    wl.style.display='block';
+    wr.style.display='block';
   }else{
-    ov.style.display='none'; meta.style.display='none'; wl.style.display='none';wr.style.display='none';
+    ov.style.display='none';
+    meta.style.display='none';
+    wl.style.display='none';
+    wr.style.display='none';
+    document.getElementById('s1').classList.remove('liveTap');
+    document.getElementById('s2').classList.remove('liveTap');
   }
+
+  const s=stats();
+  const rows=PLAYERS.map(n=>({n,...s[n]}))
+    .sort((a,b)=>b.pts-a.pts||b.w-a.w||a.n.localeCompare(b.n));
+
+  const table=document.getElementById('tableOverlay');
+  table.innerHTML=`<div class="thead">
+      <span class="title">LEAGUE TABLE (LIVE) <span class="green">●</span></span>
+      <span class="time">UPDATED ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+    </div>
+    <table class="liveTable">
+      <thead><tr><th>#</th><th>PLAYER</th><th>P</th><th>W</th><th>D</th><th>L</th><th>PTS</th></tr></thead>
+      <tbody>${rows.map((r,i)=>`<tr>
+        <td><span class="rank">${i+1}</span></td>
+        <td><b>${r.n}</b></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+        <td class="pts">${r.pts}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
 }
+
 function openView(type){
   const v=document.getElementById('view');v.className='show';
   let title=type==='league'?'🏆 LEAGUE TABLE':type==='today'?'🎯 TODAY\'S GAMES':type==='week'?'📅 FULL WEEK':'📋 RULES';
