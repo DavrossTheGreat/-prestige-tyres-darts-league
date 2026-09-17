@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+<link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
+<link rel="icon" type="image/png" href="app-icon.png">
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +17,7 @@ body{min-height:100vh}button{font:inherit}
 .hot{position:absolute;border:0;background:transparent;cursor:pointer}
 .h1{left:3%;top:35%;width:47%;height:9%} .h2{left:51%;top:35%;width:47%;height:9%}
 .h3{left:3%;top:45%;width:47%;height:9%} .h4{left:51%;top:45%;width:47%;height:9%}
-.tableHot{left:3%;top:56%;width:94%;height:25%}
+.tableHot{left:3%;top:56%;width:94%;height:25%}.championHot{left:20%;top:82%;width:60%;height:7%}
 .bottom{position:absolute;left:0;right:0;bottom:0;height:8.5%;display:flex}
 .bottom button{flex:1;border:0;background:transparent;color:transparent}
 .screen{display:none;min-height:100vh;padding:calc(18px + env(safe-area-inset-top)) 14px 90px;background:
@@ -24,9 +27,9 @@ radial-gradient(circle at 75% 5%,rgba(232,49,45,.18),transparent 30%),#080a0c}
 .head{font-weight:1000;font-size:22px;border-bottom:2px solid #e8322e;padding-bottom:10px}
 .days{display:flex;gap:6px;overflow:auto;padding:12px 0}.days button{border:0;border-radius:10px;padding:9px 12px;background:#292e34;color:#ddd;font-weight:850;white-space:nowrap}.days .on{background:#e7b84b;color:#111}
 table{width:100%;border-collapse:collapse}th{color:#8f969e;font-size:10px}th,td{padding:11px 4px;border-bottom:1px solid #2b3035;text-align:center}th:first-child,td:first-child{text-align:left}.rank{background:#e8322e;clip-path:polygon(12% 0,100% 0,88% 100%,0 100%);padding:4px 9px;font-weight:1000}.pts{font-size:18px;font-weight:1000}
-.game{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:12px 0;border-bottom:1px solid #2b3035}.buttons{display:flex;gap:4px}.buttons button{border:0;border-radius:8px;padding:8px 6px;background:#292e34;color:#fff;font-size:11px;font-weight:850}.buttons .sel{outline:2px solid #e7b84b}.buttons .win{background:#285239}.buttons .draw{background:#5b4920}
+.game{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:12px 0;border-bottom:1px solid #2b3035}.buttons{display:flex;gap:4px}.buttons button{border:0;border-radius:8px;padding:8px 6px;background:#292e34;color:#fff;font-size:10px;font-weight:850}.buttons .sel{outline:2px solid #e7b84b}.buttons .win{background:#285239}.buttons .draw{background:#5b4920}
 .weekrow{padding:14px 2px;border-bottom:1px solid #2b3035}.muted{color:#969da5}.rules{color:#c0c5ca;line-height:1.65}.reset{width:100%;padding:12px;border:1px solid #553438;border-radius:12px;background:#24191b;color:#ffb8bd;font-weight:800}
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);height:72px;background:rgba(9,11,13,.98);border-top:1px solid #30343a;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:10}.nav button{flex:1;border:0;background:none;color:#8e959d;font-size:11px;font-weight:850}.nav .on{color:#ef312e}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);height:72px;background:rgba(9,11,13,.98);border-top:1px solid #30343a;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:10}.nav button{flex:1;border:0;background:none;color:#8e959d;font-size:10px;font-weight:850}.nav .on{color:#ef312e}
 @media(min-width:431px){.app{box-shadow:0 0 50px #000}}
 </style>
 </head>
@@ -38,6 +41,7 @@ table{width:100%;border-collapse:collapse}th{color:#8f969e;font-size:10px}th,td{
     <button class="hot h3" aria-label="Full Week" onclick="show('week')"></button>
     <button class="hot h4" aria-label="Rules" onclick="show('rules')"></button>
     <button class="hot tableHot" aria-label="League Table" onclick="show('league')"></button>
+<button class="hot championHot" aria-label="Champion" onclick="show('champion')"></button>
     <div class="bottom">
       <button onclick="show('home')"></button><button onclick="show('league')"></button><button onclick="show('games')"></button><button onclick="show('week')"></button><button onclick="show('rules')"></button>
     </div>
@@ -46,14 +50,25 @@ table{width:100%;border-collapse:collapse}th{color:#8f969e;font-size:10px}th,td{
   <section id="league" class="screen"><button class="back" onclick="show('home')">‹ Back</button><div class="panel"><div class="head">LEAGUE TABLE</div><div id="table"></div></div></section>
   <section id="games" class="screen"><button class="back" onclick="show('home')">‹ Back</button><div class="panel"><div class="head">TODAY'S GAMES <span id="complete" class="muted"></span></div><div class="days" id="days"></div><div id="gamesList"></div></div></section>
   <section id="week" class="screen"><button class="back" onclick="show('home')">‹ Back</button><div class="panel"><div class="head">FULL WEEK</div><div id="weekList"></div></div></section>
-  <section id="rules" class="screen"><button class="back" onclick="show('home')">‹ Back</button><div class="panel"><div class="head">RULES</div><div class="rules"><b>Players:</b> Ross, Dan, Josh, Asif and Paul.<br><br>Everyone plays every other player once each day, Monday to Friday.<br><br><b>10 games per day • 50 games per week</b><br><br>🟢 Win = <b>2 points</b><br>🟡 Draw = <b>1 point</b><br>🔴 Loss = <b>0 points</b></div></div><div class="panel"><button class="reset" onclick="resetAll()">Reset all results</button></div></section>
+  <section id="champion" class="screen">
+<button class="back" onclick="show('home')">‹ Back</button>
+<div class="panel" style="text-align:center;padding:28px 16px">
+  <div style="font-size:64px">🏆</div>
+  <div class="head" style="border:0;text-align:center;font-size:28px">WEEKLY CHAMPION</div>
+  <div id="championName" style="font-size:36px;font-weight:1000;color:#e8322e;margin:18px 0 8px">—</div>
+  <div id="championPoints" class="muted">— points</div>
+  <div style="margin-top:22px;color:#c0c5ca">Champion is based on the league table after Friday's results.</div>
+</div>
+</section>
+
+<section id="rules" class="screen"><button class="back" onclick="show('home')">‹ Back</button><div class="panel"><div class="head">RULES</div><div class="rules"><b>Players:</b> Ross, Dan, Josh, Asif and Paul.<br><br>Everyone plays every other player once each day, Monday to Friday.<br><br><b>10 games per day • 50 games per week</b><br><br>🟢 Win = <b>2 points</b><br>🟡 Draw = <b>1 point</b><br>🔴 Loss = <b>0 points</b></div></div><div class="panel"><button class="reset" onclick="resetAll()">Reset all results</button></div></section>
 
   <div class="nav">
     <button id="nhome" class="on" onclick="show('home')">⌂<br>Home</button>
     <button id="nleague" onclick="show('league')">🏆<br>League</button>
     <button id="ngames" onclick="show('games')">🎯<br>Today</button>
     <button id="nweek" onclick="show('week')">▦<br>Week</button>
-    <button id="nrules" onclick="show('rules')">☰<br>Rules</button>
+    <button id="nchampion" onclick="show('champion')">🏆<br>Champion</button><button id="nrules" onclick="show('rules')">☰<br>Rules</button>
   </div>
 </div>
 <script>
@@ -62,31 +77,21 @@ let results=JSON.parse(localStorage.getItem("prestigeDartsResults")||"{}");
 let di=new Date().getDay();di=di===0?4:Math.min(di-1,4);let currentDay=daysArr[di];
 function gamesFor(day){let a=[];for(let i=0;i<5;i++)for(let j=i+1;j<5;j++)a.push({id:`${day}-${i}-${j}`,a:players[i],b:players[j]});return a}
 function save(){localStorage.setItem("prestigeDartsResults",JSON.stringify(results))}
-function show(id){
-  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
-  const home=document.getElementById("home");
-  if(id==="home"){home.style.display="block";}
-  else{home.style.display="none";document.getElementById(id).classList.add("active");}
-  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));
-  const n=document.getElementById("n"+id); if(n)n.classList.add("on");
-  renderAll(); window.scrollTo(0,0);
-}
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id==="home"?"home":id).classList.toggle("active",id!=="home");document.getElementById("home").style.display=id==="home"?"block":"none";document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));let n=document.getElementById("n"+id);if(n)n.classList.add("on");renderAll();scrollTo(0,0)}
 function setDay(d){currentDay=d;renderGames()}
 function setResult(id,r){results[id]=r;save();renderAll()}
 function stats(){let s={};players.forEach(p=>s[p]={p:0,w:0,d:0,l:0,pts:0});Object.entries(results).forEach(([id,r])=>{let q=id.split("-"),i=+q[1],j=+q[2];if(!players[i]||!players[j])return;let a=players[i],b=players[j];s[a].p++;s[b].p++;if(r==="a"){s[a].w++;s[a].pts+=2;s[b].l++}else if(r==="b"){s[b].w++;s[b].pts+=2;s[a].l++}else{s[a].d++;s[b].d++;s[a].pts++;s[b].pts++}});return Object.entries(s).sort((x,y)=>y[1].pts-x[1].pts||y[1].w-x[1].w||y[1].d-x[1].d)}
 function tableHTML(){return `<table><thead><tr><th># Player</th><th>P</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr></thead><tbody>${stats().map((x,k)=>`<tr><td><span class="rank">${k+1}</span> ${x[0]}</td><td>${x[1].p}</td><td>${x[1].w}</td><td>${x[1].d}</td><td>${x[1].l}</td><td class="pts">${x[1].pts}</td></tr>`).join("")}</tbody></table>`}
 function renderTable(){document.getElementById("table").innerHTML=tableHTML()}
-function renderGames(){
-  const dayBox=document.getElementById("days");
-  const completeBox=document.getElementById("complete");
-  const listBox=document.getElementById("gamesList");
-  dayBox.innerHTML=daysArr.map(d=>`<button class="${d===currentDay?'on':''}" onclick="setDay('${d}')">${d}</button>`).join("");
-  const gs=gamesFor(currentDay), done=gs.filter(g=>results[g.id]).length;
-  completeBox.textContent=` ${done}/10`;
-  listBox.innerHTML=gs.map(g=>`<div class="game"><b>${g.a} <span class="muted">vs</span> ${g.b}</b><div class="buttons"><button class="${results[g.id]==='a'?'sel win':''}" onclick="setResult('${g.id}','a')">${g.a}</button><button class="${results[g.id]==='d'?'sel draw':''}" onclick="setResult('${g.id}','d')">Draw</button><button class="${results[g.id]==='b'?'sel win':''}" onclick="setResult('${g.id}','b')">${g.b}</button></div></div>`).join("");
+function renderGames(){document.getElementById("days").innerHTML=daysArr.map(d=>`<button class="${d===currentDay?'on':''}" onclick="setDay('${d}')">${d}</button>`).join("");let gs=gamesFor(currentDay),done=gs.filter(g=>results[g.id]).length;document.getElementById("complete").textContent=` ${done}/10`;document.getElementById("gamesList").innerHTML=gs.map(g=>`<div class="game"><b>${g.a} <span class="muted">vs</span> ${g.b}</b><div class="buttons"><button class="${results[g.id]==='a'?'sel win':''}" onclick="setResult('${g.id}','a')">${g.a}</button><button class="${results[g.id]==='d'?'sel draw':''}" onclick="setResult('${g.id}','d')">Draw</button><button class="${results[g.id]==='b'?'sel win':''}" onclick="setResult('${g.id}','b')">${g.b}</button></div></div>`).join("")}
+function renderChampion(){
+  const rows=stats();
+  const c=rows[0];
+  document.getElementById("championName").textContent=c?c[0]:"—";
+  document.getElementById("championPoints").textContent=c?`${c[1].pts} points`:"No results yet";
 }
 function renderWeek(){document.getElementById("weekList").innerHTML=daysArr.map(d=>{let g=gamesFor(d),done=g.filter(x=>results[x.id]).length;return `<div class="weekrow"><b>${d}</b><span class="muted" style="float:right">${done}/10 complete</span></div>`}).join("")}
-function renderAll(){renderTable();renderGames();renderWeek()}
+function renderAll(){renderTable();renderGames();renderWeek();renderChampion()}
 function resetAll(){if(confirm("Reset every result?")){results={};save();renderAll()}}
 renderAll();
 </script>
